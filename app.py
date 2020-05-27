@@ -1,5 +1,7 @@
 from api.init import app
-from api.routes import *
+from api.basicRoutes import *
+from api.apiRoutes   import *
+
 
 
 if __name__ == '__main__':
