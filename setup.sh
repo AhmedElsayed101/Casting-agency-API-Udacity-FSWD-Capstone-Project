@@ -1,0 +1,2 @@
+export DATABASE_URL=postgres://sjxbcynwitrykr:9b0d26eec9cab38b852ffe953d48046ed2da4c9a49231ebbd0826067efcb45a6@ec2-35-169-254-43.compute-1.amazonaws.com:5432/d76g8a4qhhgarj
+export DATABASE_URL_LOCAL=postgresql://mohsen:123456@localhost/capstone

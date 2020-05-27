@@ -1,8 +1,8 @@
 from flask import (render_template,
-                    jsonify,
-                    redirect,abort,
-                    request
-                  )
+                   jsonify,
+                   redirect, abort,
+                   request
+                   )
 from app import app
 from database.models import *
 
@@ -10,8 +10,9 @@ from database.models import *
 @app.route('/api')
 def api():
     return jsonify({
-        'message':'Hello, Capstone!'
+        'message': 'Hello, Capstone!'
     })
+
 
 @app.route('/login')
 def login():
@@ -20,11 +21,12 @@ def login():
 
 # @app.route('/api/actors/new')
 # def add_actor_info():
-#     # get users info from auth0 to store in database  
+#     # get users info from auth0 to store in database
 #     return jsonify({
 #         "actors":"all actors"
 #     })
-    
+
+
 @app.route('/logout')
 def logout():
     return jsonify({
@@ -35,23 +37,21 @@ def logout():
 @app.route('/api/actors')
 def get_all_actors():
 
-    actros = Actor.query.order_by(Actor.id).all()  
+    actros = Actor.query.order_by(Actor.id).all()
 
     if len(actros) == 0:
         abort(404)
-    
+
     actors_formatted = [actor.format() for actor in actros]
 
     return jsonify({
 
-        "success" : True,
+        "success": True,
         "actors": actors_formatted,
         "actors_number": len(actors_formatted)
     })
 
-
-
-@app.route('/api/actors', methods = ['POST'])
+@app.route('/api/actors', methods=['POST'])
 def create_new_actor():
 
     data = request.get_json()
@@ -61,22 +61,22 @@ def create_new_actor():
         actor_gender = data['gender']
     except:
         abort(401)
-    
+
     new_actor = Actor(
-        name = actor_name,
-        age = actor_age,
-        gender = actor_gender
+        name=actor_name,
+        age=actor_age,
+        gender=actor_gender
     )
 
     new_actor.insert()
 
     return jsonify({
-        "success" : True,
-        "created" : new_actor.id
+        "success": True,
+        "created": new_actor.id
     })
 
 
-@app.route('/api/actors/<int:actor_id>', methods = ['GET'])
+@app.route('/api/actors/<int:actor_id>', methods=['GET'])
 def get_actor(actor_id):
 
     current_actor = Actor.query.get(actor_id)
@@ -87,7 +87,8 @@ def get_actor(actor_id):
         "actor": current_actor_formatted
     })
 
-@app.route('/api/actors/<int:actor_id>', methods = ['DELETE'])
+
+@app.route('/api/actors/<int:actor_id>', methods=['DELETE'])
 def delete_new_actor(actor_id):
 
     current_actor = Actor.query.get(actor_id)
@@ -96,11 +97,12 @@ def delete_new_actor(actor_id):
 
     current_actor.delete()
     return jsonify({
-        "success" : True,
-        "deleted" : actor_id
+        "success": True,
+        "deleted": actor_id
     })
 
-@app.route('/api/actors/<int:actor_id>', methods = ['PATCH'])
+
+@app.route('/api/actors/<int:actor_id>', methods=['PATCH'])
 def edit_new_actor(actor_id):
 
     data = request.get_json()
@@ -114,66 +116,65 @@ def edit_new_actor(actor_id):
 
     except:
         abort(401)
-    
-   
+
     current_actor.name = actor_name,
     current_actor.age = actor_age,
     current_actor.gender = actor_gender
-   
+
     current_actor.update()
 
     return jsonify({
-        "success" : True,
-        "updated" : current_actor.id
+        "success": True,
+        "updated": current_actor.id
     })
-    
-
 
 
 @app.route('/api/movies')
 def get_all_movies():
 
-    movies = Movie.query.order_by(Movie.id).all()  
+    movies = Movie.query.order_by(Movie.id).all()
 
     if len(movies) == 0:
         abort(404)
-    
+
     movies_formatted = [movie.format() for movie in movies]
 
     return jsonify({
 
-        "success" : True,
+        "success": True,
         "movies": movies_formatted,
         "movies_number": len(movies_formatted)
     })
     return jsonify({
-        "actors":"all movies"
+        "actors": "all movies"
     })
 
-@app.route('/api/movies', methods = ['POST'])
+
+@app.route('/api/movies', methods=['POST'])
 def create_new_movie():
-    
+
     data = request.get_json()
     try:
         movie_title = data['title']
         movie_start_time = data['start_time']
     except:
         abort(401)
-    
+
     new_movie = Movie(
 
-        title = movie_title,
-        start_time = movie_start_time
+        title=movie_title,
+        start_time=movie_start_time
     )
 
     new_movie.insert()
 
     return jsonify({
-        "success" : True,
-        "created" : new_movie.id
+        "success": True,
+        "created": new_movie.id
     })
 
-@app.route('/api/movies/<int:movie_id>', methods = ['GET'])
+
+@app.route('/api/movies/<int:movie_id>', methods=['GET'])
 def get_movie(movie_id):
 
     current_movie = Movie.query.get(movie_id)
@@ -185,22 +186,23 @@ def get_movie(movie_id):
     })
 
 
-@app.route('/api/movies/<int:movie_id>', methods = ['DELETE'])
+@app.route('/api/movies/<int:movie_id>', methods=['DELETE'])
 def delete_new_movie(movie_id):
-    
+
     current_movie = Movie.query.get(movie_id)
     if current_movie is None:
         abort(404)
 
     current_movie.delete()
     return jsonify({
-        "success" : True,
-        "deleted" : movie_id
+        "success": True,
+        "deleted": movie_id
     })
 
-@app.route('/api/movies/<int:movie_id>', methods = ['PATCH'])
+
+@app.route('/api/movies/<int:movie_id>', methods=['PATCH'])
 def edit_new_movie(movie_id):
-    
+
     data = request.get_json()
 
     current_movie = Movie.query.get(movie_id)
@@ -210,16 +212,13 @@ def edit_new_movie(movie_id):
         movie_start_time = data['start_time']
     except:
         abort(401)
-    
-   
+
     current_movie.title = movie_title
     current_movie.start_time = movie_start_time
-   
+
     current_movie.update()
 
     return jsonify({
-        "success" : True,
-        "updated" : current_movie.id
+        "success": True,
+        "updated": current_movie.id
     })
-    
-
