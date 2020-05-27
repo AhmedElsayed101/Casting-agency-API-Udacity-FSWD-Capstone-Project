@@ -1,4 +1,5 @@
-from api.init import app
+from app import app
+from database.models import *
 
 
 @app.route('/')
