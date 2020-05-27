@@ -7,6 +7,7 @@ from database.models import db
 
 from api.basicRoutes import *
 from api.apiRoutes import *
+from api.errorHandelers import *
 
 migrate = Migrate(app, db)
 manager = Manager(app)
