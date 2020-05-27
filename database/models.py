@@ -2,7 +2,12 @@ from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
-# class Hello(db.Model):
+# class Movies(db.Model):
+#     pass
+
+
+
+# class Actors(db.Model):
 #     pass
 
 
