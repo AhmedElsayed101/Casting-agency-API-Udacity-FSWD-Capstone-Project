@@ -6,6 +6,7 @@ from flask import (render_template,
 from app import app
 from database.models import *
 from .auth import requires_auth, token_required
+import os
 
 
 @app.route('/api')
@@ -18,10 +19,14 @@ def api(payload):
 
 @app.route('/login')
 def login():
-
-    part1 = "https://ayat101.auth0.com/authorize?audience=capstone"
-    part2 = "&response_type=token&client_id=cOct5TTeO5MKvZO7ZNJR51jX6dMSAWYb"
-    part3 = "&redirect_uri=https://127.0.0.1:5000/api"
+    audience = os.environ.get('API_AUDIENCE')
+    domain = os.environ.get('AUTH0_DOMAIN')
+    client_id = os.environ.get('CLIENT_ID')
+    redirect_url = os.environ.get('REDIRECT_URL')
+    
+    part1 = f"https://{domain}/authorize?audience={audience}"
+    part2 = f"&response_type=token&client_id={client_id}"
+    part3 = f"&redirect_uri={redirect_url}"
     url = part1+part2+part3
 
     return redirect(url)
