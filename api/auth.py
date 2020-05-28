@@ -79,8 +79,8 @@ def verify_decode_jwt(token):
 
     for key in jwks['keys']:
 
-        print('unverified', unverified_header['kid'])
-        print('kid', key['kid'])
+        # print('unverified', unverified_header['kid'])
+        # print('kid', key['kid'])
 
         if key['kid'] == unverified_header['kid']:
             rsa_key = {
@@ -132,6 +132,7 @@ def requires_auth(permission=''):
         @wraps(f)
         def wrapper(*args, **kwargs):
             token = get_token_auth_header()
+            # print(token)
             payload = verify_decode_jwt(token)
             check_permissions(permission, payload)
             return f(payload, *args, **kwargs)
@@ -139,13 +140,11 @@ def requires_auth(permission=''):
         return wrapper
     return requires_auth_decorator
 
-# def token_required(f):
-#     @wraps(f)
-#     def wrapper(*args, **kwargs):
-#         token = get_token_auth_header()
-#         payload = verify_decode_jwt(token)
-#         return f(payload, *args, **kwargs)
-#     return wrapper
 
-
-
+def token_required(f):
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        token = get_token_auth_header()
+        payload = verify_decode_jwt(token)
+        return f(payload, *args, **kwargs)
+    return wrapper

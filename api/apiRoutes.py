@@ -5,13 +5,12 @@ from flask import (render_template,
                    )
 from app import app
 from database.models import *
-from .auth import requires_auth
-
+from .auth import requires_auth, token_required
 
 
 @app.route('/api')
-@requires_auth('')
-def api():
+@token_required
+def api(payload):
     return jsonify({
         'message': 'Hello, Capstone!'
     })
@@ -19,7 +18,12 @@ def api():
 
 @app.route('/login')
 def login():
-    url = "https://ayat101.auth0.com/authorize?audience=coffee&response_type=token&client_id=72qvFBzX50vyoVDJqc3wQoBsPjpCMBZY&redirect_uri=https://127.0.0.1:8100/tabs/user-page"
+
+    part1 = "https://ayat101.auth0.com/authorize?audience=capstone"
+    part2 = "&response_type=token&client_id=cOct5TTeO5MKvZO7ZNJR51jX6dMSAWYb"
+    part3 = "&redirect_uri=https://127.0.0.1:5000/api"
+    url = part1+part2+part3
+
     return redirect(url)
 
 # @app.route('/api/actors/new')
@@ -38,7 +42,8 @@ def logout():
 
 
 @app.route('/api/actors')
-def get_all_actors():
+@requires_auth('view:actor')
+def get_all_actors(payload):
 
     actros = Actor.query.order_by(Actor.id).all()
 
@@ -54,8 +59,10 @@ def get_all_actors():
         "actors_number": len(actors_formatted)
     })
 
+
 @app.route('/api/actors', methods=['POST'])
-def create_new_actor():
+@requires_auth('add:actor')
+def create_new_actor(payload):
 
     data = request.get_json()
     try:
@@ -63,7 +70,7 @@ def create_new_actor():
         actor_age = data['age']
         actor_gender = data['gender']
     except:
-        abort(401)
+        abort(400)
 
     new_actor = Actor(
         name=actor_name,
@@ -80,19 +87,22 @@ def create_new_actor():
 
 
 @app.route('/api/actors/<int:actor_id>', methods=['GET'])
-def get_actor(actor_id):
+@requires_auth('view:actor')
+def get_actor(payload, actor_id):
 
     current_actor = Actor.query.get(actor_id)
     if current_actor is None:
         abort(404)
     current_actor_formatted = current_actor.format()
     return jsonify({
+        "success": True,
         "actor": current_actor_formatted
     })
 
 
 @app.route('/api/actors/<int:actor_id>', methods=['DELETE'])
-def delete_new_actor(actor_id):
+@requires_auth('delete:actor')
+def delete_new_actor(payload, actor_id):
 
     current_actor = Actor.query.get(actor_id)
     if current_actor is None:
@@ -106,11 +116,14 @@ def delete_new_actor(actor_id):
 
 
 @app.route('/api/actors/<int:actor_id>', methods=['PATCH'])
-def edit_new_actor(actor_id):
+@requires_auth('edit:actor')
+def edit_new_actor(payload, actor_id):
 
     data = request.get_json()
 
     current_actor = Actor.query.get(actor_id)
+    if current_actor is None:
+        abort(404)
 
     try:
         actor_name = data['name']
@@ -118,7 +131,7 @@ def edit_new_actor(actor_id):
         actor_gender = data['gender']
 
     except:
-        abort(401)
+        abort(400)
 
     current_actor.name = actor_name,
     current_actor.age = actor_age,
@@ -133,7 +146,8 @@ def edit_new_actor(actor_id):
 
 
 @app.route('/api/movies')
-def get_all_movies():
+@requires_auth('view:movie')
+def get_all_movies(payload):
 
     movies = Movie.query.order_by(Movie.id).all()
 
@@ -148,20 +162,18 @@ def get_all_movies():
         "movies": movies_formatted,
         "movies_number": len(movies_formatted)
     })
-    return jsonify({
-        "actors": "all movies"
-    })
 
 
 @app.route('/api/movies', methods=['POST'])
-def create_new_movie():
+@requires_auth('add:movie')
+def create_new_movie(payload):
 
     data = request.get_json()
     try:
         movie_title = data['title']
         movie_start_time = data['start_time']
     except:
-        abort(401)
+        abort(400)
 
     new_movie = Movie(
 
@@ -178,19 +190,23 @@ def create_new_movie():
 
 
 @app.route('/api/movies/<int:movie_id>', methods=['GET'])
-def get_movie(movie_id):
+@requires_auth('view:movie')
+def get_movie(payload, movie_id):
 
     current_movie = Movie.query.get(movie_id)
     if current_movie is None:
         abort(404)
     current_movie_formatted = current_movie.format()
+
     return jsonify({
+        "success": True,
         "movie": current_movie_formatted
     })
 
 
 @app.route('/api/movies/<int:movie_id>', methods=['DELETE'])
-def delete_new_movie(movie_id):
+@requires_auth('delete:movie')
+def delete_new_movie(payload, movie_id):
 
     current_movie = Movie.query.get(movie_id)
     if current_movie is None:
@@ -204,17 +220,21 @@ def delete_new_movie(movie_id):
 
 
 @app.route('/api/movies/<int:movie_id>', methods=['PATCH'])
-def edit_new_movie(movie_id):
+@requires_auth('edit:movie')
+def edit_new_movie(payload, movie_id):
 
     data = request.get_json()
 
     current_movie = Movie.query.get(movie_id)
 
+    if current_movie is None:
+        abort(404)
+
     try:
         movie_title = data['title']
         movie_start_time = data['start_time']
     except:
-        abort(401)
+        abort(404)
 
     current_movie.title = movie_title
     current_movie.start_time = movie_start_time
